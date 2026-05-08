@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GhostStrings Showcase</string>
+
+    <!-- OTA Strings — fallbacks shown on first launch -->
+    <string name="hero_badge">✦ OTA Content Layer</string>
+    <string name="hero_title">The Invisible String.</string>
+    <string name="hero_subtitle">Change any word in your app — instantly, without a rebuild.</string>
+    <string name="cta_primary">Explore Platform</string>
+    <string name="cta_secondary">Developer Portal</string>
+
+    <string name="stat_1_value">0ms</string>
+    <string name="stat_1_label">Redeploy Time</string>
+    <string name="stat_2_value">1KB</string>
+    <string name="stat_2_label">SDK Size</string>
+    <string name="stat_3_value">100+</string>
+    <string name="stat_3_label">Languages</string>
+
+    <string name="feature_1_icon">🚀</string>
+    <string name="feature_1_title">Zero-Rebuild Deploy</string>
+    <string name="feature_1_desc">Update copy and UI logic instantly across all platforms</string>
+
+    <string name="feature_2_icon">🌐</string>
+    <string name="feature_2_title">Global Edge Sync</string>
+    <string name="feature_2_desc">Instant localization with AI-powered context awareness</string>
+
+    <string name="feature_3_icon">⚙️</string>
+    <string name="feature_3_title">Enterprise Grade</string>
+    <string name="feature_3_desc">Built-in versioning, rollback, and team permissions</string>
+
+    <string name="promo_text">✦ GhostStrings Enterprise Edition — 2026</string>
+</resources>
