@@ -25,3 +25,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "GhostStringsDemo"
 include(":app")
+
+// 🔄 Composite Build: substitute maven sdk dependency with local sdk project
+includeBuild("../GhostStrings-Android")

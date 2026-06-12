@@ -273,16 +273,29 @@ fun HeroSection() {
     var activeLang by remember { mutableStateOf(GhostStrings.getLanguage() ?: "en") }
 
     LaunchedEffect(Unit) {
-        supportedLanguages = GhostStrings.getSupportedLanguages()
+        try {
+            android.util.Log.d("GhostStrings", "Fetching supported languages on startup...")
+            supportedLanguages = GhostStrings.getSupportedLanguages()
+            android.util.Log.d("GhostStrings", "Supported languages list: $supportedLanguages")
+        } catch (e: Exception) {
+            android.util.Log.e("GhostStrings", "Error loading supported languages", e)
+        }
     }
     
     OutlinedButton(
         onClick = { 
             isSyncing = true
-            GhostStrings.sync(force = true) {
+            android.util.Log.d("GhostStrings", "Forcing string sync...")
+            GhostStrings.sync(force = true) { success ->
                 isSyncing = false
+                android.util.Log.d("GhostStrings", "Sync success: $success")
                 coroutineScope.launch {
-                    supportedLanguages = GhostStrings.getSupportedLanguages(force = true)
+                    try {
+                        supportedLanguages = GhostStrings.getSupportedLanguages(force = true)
+                        android.util.Log.d("GhostStrings", "Supported languages list after sync: $supportedLanguages")
+                    } catch (e: Exception) {
+                        android.util.Log.e("GhostStrings", "Error loading languages after sync", e)
+                    }
                 }
             }
         },
