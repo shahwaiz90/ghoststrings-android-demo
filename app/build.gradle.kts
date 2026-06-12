@@ -39,7 +39,7 @@ android {
 
 dependencies {
     // GhostStrings SDK — Maven Central Release
-    implementation("ai.ghoststrings:android-sdk:1.0.1")
+    implementation("ai.ghoststrings:android-sdk:1.0.2")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

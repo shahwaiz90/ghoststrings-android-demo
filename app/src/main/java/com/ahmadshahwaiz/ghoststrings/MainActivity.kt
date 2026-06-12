@@ -314,59 +314,61 @@ fun HeroSection() {
             fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
     }
 
-    if (supportedLanguages.isNotEmpty()) {
-        Spacer(Modifier.height(16.dp))
-        Text("Active Language", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-        Spacer(Modifier.height(8.dp))
-        
-        var expanded by remember { mutableStateOf(false) }
-        val allLangs = listOf(GhostLanguage("en", "English")) + supportedLanguages.filter { it.localeId != "en" }
-        val currentLangObj = allLangs.find { it.localeId == activeLang } ?: allLangs.first()
-        
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .background(Color.LightGray.copy(alpha = 0.15f), shape = RoundedCornerShape(12.dp))
-                .border(BorderStroke(1.dp, Accent.copy(alpha = 0.2f)), shape = RoundedCornerShape(12.dp))
-                .clip(RoundedCornerShape(12.dp))
-                .clickable { expanded = true }
-                .padding(horizontal = 16.dp),
-            contentAlignment = Alignment.CenterStart
+    // Always show the language selector — seeded with English by default,
+    // populates with additional languages once the API response arrives.
+    Spacer(Modifier.height(16.dp))
+    Text("Active Language", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+    Spacer(Modifier.height(8.dp))
+
+    var expanded by remember { mutableStateOf(false) }
+    // English is always present; extra languages merge in from the API
+    val allLangs = listOf(GhostLanguage("en", "English")) +
+        supportedLanguages.filter { it.localeId != "en" }
+    val currentLangObj = allLangs.find { it.localeId == activeLang } ?: allLangs.first()
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .background(Color.LightGray.copy(alpha = 0.15f), shape = RoundedCornerShape(12.dp))
+            .border(BorderStroke(1.dp, Accent.copy(alpha = 0.2f)), shape = RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { expanded = true }
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "${currentLangObj.label} (${currentLangObj.localeId.uppercase()})",
-                    color = TextMain,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
+            Text(
+                text = "${currentLangObj.label} (${currentLangObj.localeId.uppercase()})",
+                color = TextMain,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            )
+            Text(
+                text = "▼",
+                color = TextMain,
+                fontSize = 11.sp
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth(0.9f)
+        ) {
+            allLangs.forEach { lang ->
+                DropdownMenuItem(
+                    text = { Text("${lang.label} (${lang.localeId.uppercase()})") },
+                    onClick = {
+                        activeLang = lang.localeId
+                        GhostStrings.setLanguage(if (lang.localeId == "en") null else lang.localeId)
+                        expanded = false
+                    }
                 )
-                Text(
-                    text = "▼",
-                    color = TextMain,
-                    fontSize = 11.sp
-                )
-            }
-            
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth(0.9f)
-            ) {
-                allLangs.forEach { lang ->
-                    DropdownMenuItem(
-                        text = { Text("${lang.label} (${lang.localeId.uppercase()})") },
-                        onClick = {
-                            activeLang = lang.localeId
-                            GhostStrings.setLanguage(if (lang.localeId == "en") null else lang.localeId)
-                            expanded = false
-                        }
-                    )
-                }
             }
         }
     }
