@@ -34,10 +34,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import com.ghoststrings.sdk.GhostLanguage
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -269,7 +274,7 @@ fun HeroSection() {
     
     val coroutineScope = rememberCoroutineScope()
     var isSyncing by remember { mutableStateOf(false) }
-    var supportedLanguages by remember { mutableStateOf<List<String>>(emptyList()) }
+    var supportedLanguages by remember { mutableStateOf<List<GhostLanguage>>(emptyList()) }
     var activeLang by remember { mutableStateOf(GhostStrings.getLanguage() ?: "en") }
 
     LaunchedEffect(Unit) {
@@ -313,33 +318,54 @@ fun HeroSection() {
         Spacer(Modifier.height(16.dp))
         Text("Active Language", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+        
+        var expanded by remember { mutableStateOf(false) }
+        val allLangs = listOf(GhostLanguage("en", "English")) + supportedLanguages.filter { it.localeId != "en" }
+        val currentLangObj = allLangs.find { it.localeId == activeLang } ?: allLangs.first()
+        
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .background(Color.LightGray.copy(alpha = 0.15f), shape = RoundedCornerShape(12.dp))
+                .border(BorderStroke(1.dp, Accent.copy(alpha = 0.2f)), shape = RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { expanded = true }
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.CenterStart
         ) {
-            val allLangs = listOf("en") + supportedLanguages.filter { it != "en" }
-            allLangs.forEach { langCode ->
-                val isSelected = activeLang == langCode
-                val displayName = when (langCode) {
-                    "en" -> "English"
-                    "es" -> "Español"
-                    "ur" -> "اردو"
-                    else -> langCode.uppercase()
-                }
-                
-                Button(
-                    onClick = {
-                        activeLang = langCode
-                        GhostStrings.setLanguage(if (langCode == "en") null else langCode)
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isSelected) Accent else Color.LightGray.copy(alpha = 0.2f),
-                        contentColor = if (isSelected) Color.White else TextMain
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.height(36.dp)
-                ) {
-                    Text(displayName, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "${currentLangObj.label} (${currentLangObj.localeId.uppercase()})",
+                    color = TextMain,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = "▼",
+                    color = TextMain,
+                    fontSize = 11.sp
+                )
+            }
+            
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.fillMaxWidth(0.9f)
+            ) {
+                allLangs.forEach { lang ->
+                    DropdownMenuItem(
+                        text = { Text("${lang.label} (${lang.localeId.uppercase()})") },
+                        onClick = {
+                            activeLang = lang.localeId
+                            GhostStrings.setLanguage(if (lang.localeId == "en") null else lang.localeId)
+                            expanded = false
+                        }
+                    )
                 }
             }
         }
