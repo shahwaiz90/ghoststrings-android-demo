@@ -41,8 +41,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -262,13 +267,23 @@ fun HeroSection() {
     
     Spacer(Modifier.height(16.dp))
     
-    var isSyncing by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    var isSyncing by remember { mutableStateOf(false) }
+    var supportedLanguages by remember { mutableStateOf<List<String>>(emptyList()) }
+    var activeLang by remember { mutableStateOf(GhostStrings.getLanguage() ?: "en") }
+
+    LaunchedEffect(Unit) {
+        supportedLanguages = GhostStrings.getSupportedLanguages()
+    }
     
     OutlinedButton(
         onClick = { 
             isSyncing = true
             GhostStrings.sync(force = true) {
                 isSyncing = false
+                coroutineScope.launch {
+                    supportedLanguages = GhostStrings.getSupportedLanguages(force = true)
+                }
             }
         },
         enabled = !isSyncing,
@@ -279,6 +294,42 @@ fun HeroSection() {
     ) {
         Text(if (isSyncing) "Checking for updates..." else "Check for Updates",
             fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+    }
+
+    if (supportedLanguages.isNotEmpty()) {
+        Spacer(Modifier.height(16.dp))
+        Text("Active Language", color = Muted, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+        ) {
+            val allLangs = listOf("en") + supportedLanguages.filter { it != "en" }
+            allLangs.forEach { langCode ->
+                val isSelected = activeLang == langCode
+                val displayName = when (langCode) {
+                    "en" -> "English"
+                    "es" -> "Español"
+                    "ur" -> "اردو"
+                    else -> langCode.uppercase()
+                }
+                
+                Button(
+                    onClick = {
+                        activeLang = langCode
+                        GhostStrings.setLanguage(if (langCode == "en") null else langCode)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isSelected) Accent else Color.LightGray.copy(alpha = 0.2f),
+                        contentColor = if (isSelected) Color.White else TextMain
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Text(displayName, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
     }
 }
 
