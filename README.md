@@ -10,7 +10,7 @@ This project demonstrates the powerful "Zero-Code" integration of the GhostStrin
 ## 🛠️ How to Run
 
 1. Open this repository in **Android Studio**.
-2. Wait for Gradle to sync. It will automatically download the GhostStrings SDK from Maven Central (`ai.ghoststrings:android-sdk:1.0.0`).
+2. Wait for Gradle to sync. It will automatically download the GhostStrings SDK from Maven Central (`ai.ghoststrings:android-sdk:1.0.2`).
 3. Connect an Android device or start an emulator.
 4. Hit **Run** (Shift + F10).
 
