@@ -51,6 +51,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
@@ -92,11 +94,11 @@ private val TextMain   = Color(0xFF0F172A)
 private val Green      = Color(0xFF16A34A)
 
 /**
- * For a truly "Zero Code Change" experience in legacy projects:
- * 
- * 1. Your UI code (Composables/Activities) keeps using standard APIs:
- *    - `stringResource(R.string.hero_title)`
- *    - `context.getString(R.string.hero_title)`
+ * The demo activity showcasing GhostStrings integration.
+ *
+ * Notice how:
+ * 1. The code calls standard [stringResource] and [Context.getString].
+ *    No wrapper code or custom lookups are needed in individual views.
  * 
  * 2. You only add ONE wrapper at the root of your app.
  */
@@ -112,8 +114,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             // This wrapper enables stringResource() interception for ALL Composables
             GhostStringsProvider {
-                MaterialTheme {
-                    DemoScreen()
+                val strings by GhostStrings.strings.collectAsState()
+                key(strings) {
+                    MaterialTheme {
+                        DemoScreen()
+                    }
                 }
             }
         }
