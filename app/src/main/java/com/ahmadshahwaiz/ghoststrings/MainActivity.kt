@@ -287,6 +287,14 @@ fun HeroSection() {
             android.util.Log.d("GhostStrings", "Fetching supported languages on startup...")
             supportedLanguages = GhostStrings.getSupportedLanguages()
             android.util.Log.d("GhostStrings", "Supported languages list: $supportedLanguages")
+            
+            // If the last selected language is no longer in the supported list, fall back to English
+            val currentActive = GhostStrings.getLanguage()
+            if (currentActive != null && currentActive != "en" && supportedLanguages.none { it.localeId == currentActive }) {
+                android.util.Log.d("GhostStrings", "Last active language ($currentActive) was deleted/is unsupported. Falling back to English.")
+                GhostStrings.setLanguage(null)
+                activeLang = "en"
+            }
         } catch (e: Exception) {
             android.util.Log.e("GhostStrings", "Error loading supported languages", e)
         }
@@ -303,6 +311,14 @@ fun HeroSection() {
                     try {
                         supportedLanguages = GhostStrings.getSupportedLanguages(force = true)
                         android.util.Log.d("GhostStrings", "Supported languages list after sync: $supportedLanguages")
+                        
+                        // Re-validate active language selection after a fresh sync
+                        val currentActive = GhostStrings.getLanguage()
+                        if (currentActive != null && currentActive != "en" && supportedLanguages.none { it.localeId == currentActive }) {
+                            android.util.Log.d("GhostStrings", "Active language ($currentActive) was deleted. Resetting to English.")
+                            GhostStrings.setLanguage(null)
+                            activeLang = "en"
+                        }
                     } catch (e: Exception) {
                         android.util.Log.e("GhostStrings", "Error loading languages after sync", e)
                     }
