@@ -322,9 +322,23 @@ fun HeroSection() {
 
     var expanded by remember { mutableStateOf(false) }
     // English is always present; extra languages merge in from the API
-    val allLangs = listOf(GhostLanguage("en", "English")) +
-        supportedLanguages.filter { it.localeId != "en" }
-    val currentLangObj = allLangs.find { it.localeId == activeLang } ?: allLangs.first()
+    val allLangs = remember(supportedLanguages, activeLang) {
+        val list = mutableListOf(GhostLanguage("en", "English"))
+        supportedLanguages.forEach { lang ->
+            if (lang.localeId != "en") {
+                list.add(lang)
+            }
+        }
+        val activeLocaleId = activeLang ?: "en"
+        if (list.none { it.localeId == activeLocaleId }) {
+            val locale = java.util.Locale(activeLocaleId)
+            val name = locale.getDisplayLanguage(locale).replaceFirstChar { if (it.isLowerCase()) it.titlecase(java.util.Locale.getDefault()) else it.toString() }
+            list.add(GhostLanguage(activeLocaleId, name))
+        }
+        list
+    }
+    val currentLangObj = allLangs.find { it.localeId == (activeLang ?: "en") } ?: allLangs.first()
+
 
     Box(
         modifier = Modifier
