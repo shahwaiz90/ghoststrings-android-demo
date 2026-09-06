@@ -27,15 +27,4 @@ dependencyResolutionManagement {
 rootProject.name = "GhostStringsDemo"
 include(":app")
 
-// 🔄 Composite Build: substitute maven sdk dependency with local sdk project if present
-val localSdkDir = file("../../ghoststrings-android").takeIf { it.exists() }
-    ?: file("../GhostStrings-Android").takeIf { it.exists() }
-
-if (localSdkDir != null) {
-    includeBuild(localSdkDir) {
-        dependencySubstitution {
-            substitute(module("ai.ghoststrings:android-sdk")).using(project(":ghoststrings-sdk"))
-        }
-    }
-}
 
